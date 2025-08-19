@@ -2,6 +2,7 @@ import { pollCommits } from "@/lib/github";
 import { createTRPCRouter, protectedProcedure } from "../trpc";
 import z from "zod";
 import { checkCredits, indexGithubRepo } from "@/lib/github-loader";
+import { TRPCError } from "@trpc/server";
 // createTRPCRouter: Creates a tRPC router to group related API endpoints.
 // createProject: This is a mutation endpoint (for creating a project).
 // protectedProcedure: Ensures only authenticated users can call this endpoint.
@@ -90,16 +91,50 @@ export const projectRouter = createTRPCRouter({
        return projects;
     }),
     //this one will help us with fetching all the commits for a specific project
-    getCommits: protectedProcedure.input(z.object({
-        projectId: z.string()
-    })).query(async ({ ctx, input }) => {
-        pollCommits(input.projectId).then().catch(console.error)
-        return await ctx.db.commit.findMany({
-            where: {
-                projectId: input.projectId
-            }
-        })
-    }),
+    // getCommits: protectedProcedure.input(z.object({
+    //     projectId: z.string()
+    // })).query(async ({ ctx, input }) => {
+    //     pollCommits(input.projectId).then().catch(console.error)
+    //     return await ctx.db.commit.findMany({
+    //         where: {
+    //             projectId: input.projectId
+    //         }
+    //     })
+    // }),
+
+    getCommits: protectedProcedure
+  .input(z.object({
+    projectId: z.string()
+  }))
+  .query(async ({ ctx, input }) => {
+    return await ctx.db.commit.findMany({
+      where: {
+        projectId: input.projectId
+      },
+      orderBy: {
+        commitDate: 'desc'
+      },
+      take: 50 // Limit to last 50 commits
+    });
+  }),
+
+  syncCommits: protectedProcedure
+  .input(z.object({
+    projectId: z.string()
+  }))
+  .mutation(async ({ ctx, input }) => {
+    try {
+      // Use your existing pollCommits function
+      await pollCommits(input.projectId);
+      return { success: true, message: 'Commits synced successfully' };
+    } catch (error) {
+      console.error('Manual sync error:', error);
+      throw new TRPCError({
+        code: 'INTERNAL_SERVER_ERROR',
+        message: 'Failed to sync commits'
+      });
+    }
+  }),
 
     //route will help to save the users currently asked ai questino to our database and make sure thay can access and see prev asked question
 
