@@ -10,16 +10,16 @@ export async function POST(req: NextRequest) {
     const signature = (await headers()).get('x-hub-signature-256');
 
     // Verify webhook signature
-    // if (process.env.GITHUB_WEBHOOK_SECRET) {
-    //   const expectedSignature = `sha256=${crypto
-    //     .createHmac('sha256', process.env.GITHUB_WEBHOOK_SECRET)
-    //     .update(body)
-    //     .digest('hex')}`;
+    if (process.env.GITHUB_WEBHOOK_SECRET) {
+      const expectedSignature = `sha256=${crypto
+        .createHmac('sha256', process.env.GITHUB_WEBHOOK_SECRET)
+        .update(body)
+        .digest('hex')}`;
       
-    //   if (signature !== expectedSignature) {
-    //     return NextResponse.json({ error: 'Invalid signature' }, { status: 401 });
-    //   }
-    // }
+      if (signature !== expectedSignature) {
+        return NextResponse.json({ error: 'Invalid signature' }, { status: 401 });
+      }
+    }
 
     const payload = JSON.parse(body);
     
