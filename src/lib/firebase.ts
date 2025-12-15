@@ -1,113 +1,58 @@
-// // Import the functions you need from the SDKs you need
-// import { error } from "console";
-// import { initializeApp } from "firebase/app";
-// import {getDownloadURL, getStorage, ref, uploadBytesResumable} from "firebase/storage";
-// // TODO: Add SDKs for Firebase products that you want to use
-// // https://firebase.google.com/docs/web/setup#available-libraries
+"use client";
 
-// // Your web app's Firebase configuration
-// const firebaseConfig = {
-//   apiKey: "AIzaSyA_k8q6YdvlXX-kTCL6wdPimsfjk8nGyQ0",
-//   authDomain: "rune-23f31.firebaseapp.com",
-//   projectId: "rune-23f31",
-//   storageBucket: "rune-23f31.firebasestorage.app",
-//   messagingSenderId: "559958197212",
-//   appId: "1:559958197212:web:94406a669199d0a52c4519"
-// };
+import { uploadFileAction } from "@/app/actions/upload";
 
-// // Initialize Firebase
-// const app = initializeApp(firebaseConfig);
-// export const storage = getStorage(app);
+/**
+ * Upload file to Uploadthing storage
+ * @param file - File to upload
+ * @param setProgress - Optional callback for upload progress
+ * @returns Promise with the public URL of uploaded file
+ */
+export async function uplaodFile(
+  file: File,
+  setProgress?: (progress: number) => void
+): Promise<string> {
+  return new Promise(async (resolve, reject) => {
+    try {
+      // Validate file
+      if (!file || file.size === 0) {
+        throw new Error("Invalid file provided");
+      }
 
+      console.log(
+        "📤 Uploading file:",
+        file.name,
+        `(${(file.size / 1024 / 1024).toFixed(2)} MB)`
+      );
 
-// //function for uploading the video file to the firebase 
-// export async function uplaodFile(file: File,setProgress?: (progress: number)=>void){
-//     return new Promise((resolve, reject)=>{
-//         try{
-//             const storageRef = ref(storage,file.name)
-//             const uploadTask = uploadBytesResumable(storageRef, file);
+      // Simulate progress
+      let progress = 0;
+      const progressInterval = setInterval(() => {
+        progress += Math.random() * 20;
+        if (progress > 90) progress = 90;
+        if (setProgress) setProgress(Math.floor(progress));
+      }, 300);
 
-//             uploadTask.on('state_changed', (snapshot) => {
-//                 const progress = Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100);
-//                 if(setProgress) setProgress(progress);
-//                 switch (snapshot.state) {
-//                     case 'paused':
-//                         console.log('Upload is paused');
-//                         break;
-//                     case 'running':
-//                         console.log('Upload is running');
-//                         break;
-//                 }
-//             },error=>{
-//                 console.error('Upload failed:', error);
-//                 reject(error);
-//             }, ()=>{
-//                 getDownloadURL(uploadTask.snapshot.ref).then(downloadURL=>{
-//                     resolve(downloadURL);
-//                 })
-//             });
-//         }catch(error){
-//             console.error('Error uploading file:', error);
-//             reject(error);
-//         }
-//     })
-// }
+      // Create form data
+      const formData = new FormData();
+      formData.append("file", file);
 
-import { createClient } from '@supabase/supabase-js'
+      // Upload using server action
+      const result = await uploadFileAction(formData);
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+      // Clear progress interval
+      clearInterval(progressInterval);
+      if (setProgress) setProgress(100);
 
-const supabase = createClient(supabaseUrl, supabaseAnonKey)
+      if (!result.success || !result.url) {
+        throw new Error(result.error || "Upload failed - no URL returned");
+      }
 
-// ✅ SAME FUNCTION NAME - just replace the implementation
-export async function uplaodFile(file: File, setProgress?: (progress: number) => void) {
-    return new Promise(async (resolve, reject) => {
-        try {
-            // Create unique filename with timestamp
-            const timestamp = Date.now()
-            const fileName = `${timestamp}-${file.name.replace(/[^a-zA-Z0-9.-]/g, '_')}`
-            
-            // Simulate upload progress since Supabase doesn't provide real-time progress
-            let progress = 0
-            const progressInterval = setInterval(() => {
-                progress += Math.random() * 15
-                if (progress > 90) progress = 90
-                if (setProgress) setProgress(Math.floor(progress))
-            }, 200)
-
-            // Upload to Supabase Storage
-            const { data, error } = await supabase.storage
-                .from('meetings')
-                .upload(fileName, file, {
-                    cacheControl: '3600',
-                    upsert: false
-                })
-
-            // Clear progress interval
-            clearInterval(progressInterval)
-            if (setProgress) setProgress(100)
-
-            if (error) {
-                console.error('Upload failed:', error)
-                reject(error)
-                return
-            }
-
-            // Get public URL
-            const { data: urlData } = supabase.storage
-                .from('meetings')
-                .getPublicUrl(fileName)
-
-            console.log('✅ Upload successful:', urlData.publicUrl)
-            resolve(urlData.publicUrl as string)
-
-        } catch (error) {
-            console.error('Error uploading file:', error)
-            reject(error)
-        }
-    })
+      console.log("✅ Upload successful:", result.url);
+      resolve(result.url); // Now TypeScript knows result.url exists
+    } catch (error) {
+      console.error("❌ Error uploading file:", error);
+      reject(error);
+    }
+  });
 }
-
-// ✅ Keep the storage export for compatibility (optional)
-export const storage = supabase.storage
