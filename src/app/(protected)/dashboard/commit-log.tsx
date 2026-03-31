@@ -190,9 +190,56 @@ import { api } from '@/trpc/react';
 import Useproject from '@/hooks/use-project';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { RefreshCw, GitCommit, ExternalLink } from 'lucide-react';
+import { RefreshCw, GitCommit, ExternalLink, Bot, Loader2, CheckCircle2 } from 'lucide-react';
 import Link from 'next/link';
 import { Badge } from '@/components/ui/badge';
+import { toast } from 'sonner';
+
+// Per-commit Review button
+function ReviewButton({ projectId, commitHash, commitMessage }: {
+  projectId: string
+  commitHash: string
+  commitMessage: string
+}) {
+  const [status, setStatus] = useState<'idle' | 'loading' | 'done'>('idle')
+  const utils = api.useUtils()
+
+  const { mutate: runReview } = api.project.runCodeReview.useMutation({
+    onMutate: () => setStatus('loading'),
+    onSuccess: () => {
+      setStatus('done')
+      toast.success('Review started — results appear below in ~20s')
+      // Refresh the code reviews card after a short delay
+      setTimeout(() => utils.project.getCodeReviews.invalidate({ projectId }), 5000)
+    },
+    onError: (err) => {
+      setStatus('idle')
+      if (err.message.includes('already exists')) {
+        toast.info('Review already exists for this commit')
+      } else {
+        toast.error('Failed to start review')
+      }
+    },
+  })
+
+  return (
+    <Button
+      variant="ghost"
+      size="sm"
+      className="h-6 px-2 text-xs text-gray-500 hover:text-primary"
+      disabled={status !== 'idle'}
+      onClick={() => runReview({ projectId, commitHash, commitMessage })}
+    >
+      {status === 'loading' ? (
+        <><Loader2 className="size-3 animate-spin mr-1" />Reviewing…</>
+      ) : status === 'done' ? (
+        <><CheckCircle2 className="size-3 mr-1 text-green-500" />Queued</>
+      ) : (
+        <><Bot className="size-3 mr-1" />Review</>
+      )}
+    </Button>
+  )
+}
 
 const CommitLog = () => {
   const { project } = Useproject();
@@ -200,29 +247,13 @@ const CommitLog = () => {
 
   const { data: commits, isLoading, refetch } = api.project.getCommits.useQuery(
     { projectId: project?.id! },
-    {
-      enabled: !!project?.id,
-      refetchInterval: 60000, // Refetch every minute
-    }
+    { enabled: !!project?.id, refetchInterval: 60000 }
   );
 
   const { mutate: syncCommits } = api.project.syncCommits.useMutation({
-    onSuccess: () => {
-      refetch();
-      setIsManualSyncing(false);
-    },
-    onError: (error) => {
-      console.error('Sync error:', error);
-      setIsManualSyncing(false);
-    }
+    onSuccess: () => { refetch(); setIsManualSyncing(false); },
+    onError:   () => setIsManualSyncing(false),
   });
-
-  const handleManualSync = () => {
-    if (project?.id) {
-      setIsManualSyncing(true);
-      syncCommits({ projectId: project.id });
-    }
-  };
 
   if (isLoading) {
     return (
@@ -243,13 +274,14 @@ const CommitLog = () => {
         <Button
           variant="outline"
           size="sm"
-          onClick={handleManualSync}
+          onClick={() => { setIsManualSyncing(true); syncCommits({ projectId: project?.id! }); }}
           disabled={isManualSyncing}
         >
           <RefreshCw className={`h-4 w-4 ${isManualSyncing ? 'animate-spin' : ''}`} />
           {isManualSyncing ? 'Syncing...' : 'Sync Now'}
         </Button>
       </div>
+
       <ul className="space-y-6">
         {(!commits || commits.length === 0) ? (
           <li className="text-center py-8 text-gray-500">
@@ -275,27 +307,31 @@ const CommitLog = () => {
                   className="relative mt-4 size-8 flex-none rounded-full bg-gray-50"
                 />
                 <div className="flex-auto rounded-md bg-white p-3 ring-1 ring-inset ring-gray-200">
-                  <div className="flex justify-between gap-x-4">
+                  <div className="flex justify-between gap-x-4 items-center">
                     <Link
                       target="_blank"
-                      href={`${project?.githubUrl}/commits/${commit.commitHash}`}
+                      href={`${project?.githubUrl}/commit/${commit.commitHash}`}
                       className="py-0.5 text-xs leading-5 text-gray-500"
                     >
-                      <span className="font-medium text-gray-900">
-                        {commit.commitAuthorName}
-                      </span>{" "}
+                      <span className="font-medium text-gray-900">{commit.commitAuthorName}</span>{" "}
                       <span className="inline-flex items-center">
-                        committed
-                        <ExternalLink className="ml-1 size-4" />
+                        committed <ExternalLink className="ml-1 size-4" />
                       </span>
                     </Link>
-                    <Badge variant="secondary" className="font-mono text-xs">
-                      {commit.commitHash.slice(0, 7)}
-                    </Badge>
+                    <div className="flex items-center gap-2">
+                      {project?.id && (
+                        <ReviewButton
+                          projectId={project.id}
+                          commitHash={commit.commitHash}
+                          commitMessage={commit.commitMessage}
+                        />
+                      )}
+                      <Badge variant="secondary" className="font-mono text-xs">
+                        {commit.commitHash.slice(0, 7)}
+                      </Badge>
+                    </div>
                   </div>
-                  <span className="font-semibold">
-                    {commit.commitMessage}
-                  </span>
+                  <span className="font-semibold">{commit.commitMessage}</span>
                   <pre className="mt-2 whitespace-pre-wrap text-sm leading-6 text-gray-500">
                     {commit.summary}
                   </pre>

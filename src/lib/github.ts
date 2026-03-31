@@ -4,6 +4,7 @@ import { db } from '@/server/db';
 import {Octokit} from 'octokit';
 import axios from 'axios';
 import { aiSummariseCommit } from './gemini';
+import { reIndexChangedFiles } from './github-loader';
 
 export const octokit = new Octokit({
     auth: process.env.GITHUB_TOKEN
@@ -77,13 +78,10 @@ summaries.forEach((summary, index) => {
     }
 });
 
-    const commits = await db.commit.createMany({
+    await db.commit.createMany({
         data: summaries.map((summary, index) =>{
             console.log(`processing commit ${index}`)
-
-            console.log(`💾 Saving commit ${index + 1}:`);
-        console.log(`   Summary: "${summary}"`);
-        console.log(`   Summary length: ${summary?.length || 0}`);
+            console.log(`💾 Saving commit ${index + 1}: "${summary?.slice(0, 60)}"`)
             return {
                 projectId: projectId,
                 commitHash: unprocessedCommits[index]!.commitHash,
@@ -95,6 +93,16 @@ summaries.forEach((summary, index) => {
             }
         })
     })
+
+    // Fire-and-forget: re-embed any files changed in the new commits so that
+    // AI tools (bug investigation, test coverage, Q&A) always have fresh context
+    if (unprocessedCommits.length > 0) {
+        void reIndexChangedFiles(
+            projectId,
+            githubUrl,
+            unprocessedCommits.map(c => c.commitHash),
+        )
+    }
 }
 
 async function summariseCommit(githubUrl: string, commitHash: string){
@@ -129,5 +137,4 @@ async function filterUnprocessedCommits(projectId: string, commitHashes: Respons
 
 //u can always run this to check that ur endpoint is working in the console or not ...this is a very effeicient way u can use the typescript to make sure that the api endpoints are working correctly
 // getCommitHashes(githubUrl)
-
-pollCommits('cme9l3pqe0003b204slsuccaq')
+// pollCommits('your-project-id')

@@ -1,13 +1,9 @@
-import {GoogleGenerativeAI} from '@google/generative-ai';
 import { Document } from '@langchain/core/documents';
-import Groq from "groq-sdk"; // ✅ Add this line
+import Groq from "groq-sdk";
+import axios from 'axios';
 
-const genAI=new GoogleGenerativeAI(process.env.GEMINI_API_KEY!)
-const model=genAI.getGenerativeModel(
-    {
-        model: 'gemini-1.5-flash',
-    }
-)
+// Groq handles all LLM text generation (summaries, Q&A)
+// Hugging Face handles embeddings — all-mpnet-base-v2 → 768 dims (matches vector(768) in DB)
 
 
 // export const aiSummariseCommit = async (diff: string) => {
@@ -131,48 +127,72 @@ It is given only as an example of appropriate comments.`
 }
 
 export async function summariseCode(doc: Document) {
-    console.log("getting summary for document:", doc.metadata.source);
+    const fileName = (doc.metadata.source ?? doc.metadata.chunkId ?? 'unknown') as string
+    console.log("getting summary for:", fileName);
     try {
-        const code = doc.pageContent.slice(0, 10000);
+        const ext  = fileName.split('.').pop() ?? ''
+        const code = doc.pageContent.slice(0, 8000)
+
         const response = await groq.chat.completions.create({
             messages: [
                 {
-                    role: "system",
-                    content: "You are an intelligent senior software engineer who specialises in onboarding junior software engineers into projects."
+                    role: 'system',
+                    content: 'You are a code indexing engine. Output only the structured format requested — no extra text, no markdown fences.',
                 },
                 {
-                    role: "user",
-                    content: `You are onboarding a junior software engineer and explaining to them the purpose of the ${doc.metadata.source} file.\n\nHere is the code:\n---\n${code}\n---\n\nGive a summary no more than 100 words of the code above.`
-                }
+                    role: 'user',
+                    content: `Analyze this code file and produce a structured index entry.
+
+File: ${fileName}
+
+Output EXACTLY this format:
+TYPE: [React Component | Next.js API Route | tRPC Router | Utility | Hook | Config | Test | Schema | Other]
+EXPORTS: [comma-separated exported names, or "none"]
+FUNCTIONS: [each as "name(params) - what it does", one per line, max 6]
+DEPENDENCIES: [key imported packages/files, comma-separated, max 8]
+PURPOSE: [2 sentences: what this file does and when it is used]
+
+Code:
+\`\`\`${ext}
+${code}
+\`\`\``,
+                },
             ],
-            model: "llama-3.1-8b-instant",
-            max_tokens: 150,
-        });
-        
-        const summary = response.choices[0]?.message?.content || '';
-        console.log(`🔹 Summary for ${doc.metadata.source}:`, summary.slice(0, 100) + '...');
-        
-        //✅ Add delay
-        await new Promise(resolve => setTimeout(resolve, 2000)); // 2 second delay
-        
-        return summary;
+            model:       'llama-3.1-8b-instant',
+            max_tokens:  280,
+            temperature: 0.1,
+        })
+
+        const summary = response.choices[0]?.message?.content ?? ''
+        console.log(`🔹 Indexed ${fileName}:`, summary.slice(0, 80) + '…')
+        return summary
     } catch (error) {
-        console.error(`❌ Error summarizing ${doc.metadata.source}:`, error);
-        return '';
+        console.error(`❌ Error summarizing ${fileName}:`, error)
+        return ''
     }
 }
 
 
 
-// here we will be writing the coolest function of getting the embedding form of this new summary
-export async function generateEmbedding(summary: string){
-    const model= genAI.getGenerativeModel({
-        model: "text-embedding-004"
-    })
-    const result = await model.embedContent(summary)
-    const embedding = result.embedding
-    return embedding.values
-} 
+// Hugging Face — BAAI/bge-base-en-v1.5 → 768 dims
+// Matches the existing vector(768) column in the DB — no schema change needed
+export async function generateEmbedding(summary: string): Promise<number[]> {
+    const response = await axios.post<number[][] | number[]>(
+        'https://router.huggingface.co/hf-inference/models/BAAI/bge-base-en-v1.5',
+        { inputs: summary },
+        {
+            headers: {
+                Authorization: `Bearer ${process.env.HUGGINGFACE_API_KEY}`,
+                'Content-Type': 'application/json',
+            },
+            timeout: 30_000,
+        }
+    );
+    // HF returns either [[...768 floats]] or [...768 floats]
+    const data = response.data;
+    const embedding = Array.isArray(data[0]) ? (data as number[][])[0]! : (data as number[]);
+    return embedding;
+}
 
 
 

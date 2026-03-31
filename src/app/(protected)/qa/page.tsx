@@ -1,166 +1,143 @@
-// 'use client'
-// import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
-// import Useproject from '@/hooks/use-project';
-// import { api } from '@/trpc/react';
-// import React from 'react'
-// import AskQuestionCard from '../dashboard/ask-question-card';
-// import MDEditor from '@uiw/react-md-editor';
-// import CodeReferences from '../dashboard/code-referances';
-
-// const QApage = () => {
-//   //now here we will be gettin the current project id using the function call
-//   const {projectId} = Useproject();
-//   const {data: questions} = api.project.getQuestions.useQuery({ projectId });
-
-//   const [questionIndex, setQuestionIndex] = React.useState(0)
-//   const question = questions?.[questionIndex];
-
-//   return (
-//     <Sheet>
-//       <AskQuestionCard />
-//         <div className='h-4'></div>
-//         <h1 className='text-xl font-semibold'>Saved questions</h1>
-//         <div className='h-2'></div>
-//         <div className='flex flex-col gap-2'>
-//           {questions?.map((question,index) => {
-//               return <React.Fragment key={question.id}>
-//                 <SheetTrigger onClick={() => setQuestionIndex(index)}>
-//                   <div className='flex items-center gap-4 bg-white rounded-lg p-4 shadow border'>
-//                     <img className='rounded-full' height={30} width={30} src={question.user.imageUrl ?? ""}/>
-
-//                     <div className='text-left flex flex-col'>
-//                       <div className='flex items-center gap-2'>
-//                         <p className='text-gray-700 line-clamp-1 text-lg font-medium'>
-//                           {question.question}
-//                         </p>
-//                         <span className='text-xs text-grey-400 whitespace-nowrap'>
-//                           {new Date(question.createdAt).toLocaleDateString()}
-//                         </span>
-//                       </div>
-//                       <p className='text-grey-500 line-clamp-1 text-sm'>
-//                         {question.answer} 
-//                       </p>
-//                     </div>
-//                   </div>
-//                 </SheetTrigger>
-//               </React.Fragment>
-//           })}
-//         </div>
-
-//         {question && (
-//           <SheetContent className='sm:max-w-[80vw]'>
-//             <SheetHeader>
-//               <SheetTitle>
-//                 {question.question}
-//               </SheetTitle>
-//               <MDEditor.Markdown source={question.answer} />
-//               <CodeReferences filesReferences={(question.filesReferences ?? []) as any} />
-//             </SheetHeader>
-//           </SheetContent>
-//         )}
-//     </Sheet>
-//   )
-// }
-
-// export default QApage
-
 'use client'
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
-import Useproject from '@/hooks/use-project';
-import { api } from '@/trpc/react';
+
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet'
+import Useproject from '@/hooks/use-project'
+import { api } from '@/trpc/react'
 import React from 'react'
-import AskQuestionCard from '../dashboard/ask-question-card';
-import MDEditor from '@uiw/react-md-editor';
-import CodeReferences from '../dashboard/code-referances';
+import AskQuestionCard from '../dashboard/ask-question-card'
+import MDEditor from '@uiw/react-md-editor'
+import CodeReferences from '../dashboard/code-referances'
+import { MessageSquare, Calendar, BookOpen } from 'lucide-react'
 
 const QApage = () => {
-  const {projectId} = Useproject();
-  const {data: questions} = api.project.getQuestions.useQuery({ projectId });
+  const { projectId } = Useproject()
+  const { data: questions } = api.project.getQuestions.useQuery({ projectId })
 
   const [questionIndex, setQuestionIndex] = React.useState(0)
-  const question = questions?.[questionIndex];
+  const question = questions?.[questionIndex]
 
   return (
-    <Sheet>
-      <AskQuestionCard />
-        <div className='h-4'></div>
-        <h1 className='text-xl font-semibold'>Saved questions</h1>
-        <div className='h-2'></div>
-        <div className='flex flex-col gap-2'>
-          {questions?.map((question,index) => {
-              return <React.Fragment key={question.id}>
-                <SheetTrigger onClick={() => setQuestionIndex(index)}>
-                  <div className='flex items-center gap-4 bg-white rounded-lg p-4 shadow border'>
-                    <img className='rounded-full' height={30} width={30} src={question.user.imageUrl ?? ""}/>
+    <div className="p-6 max-w-5xl mx-auto space-y-8">
 
-                    <div className='text-left flex flex-col'>
-                      <div className='flex items-center gap-2'>
-                        <p className='text-gray-700 line-clamp-1 text-lg font-medium'>
-                          {question.question}
-                        </p>
-                        <span className='text-xs text-grey-400 whitespace-nowrap'>
-                          {new Date(question.createdAt).toLocaleDateString()}
-                        </span>
-                      </div>
-                      <p className='text-grey-500 line-clamp-1 text-sm'>
-                        {question.answer} 
-                      </p>
-                    </div>
-                  </div>
-                </SheetTrigger>
-              </React.Fragment>
-          })}
+      {/* Header */}
+      <div>
+        <div className="flex items-center gap-3 mb-1">
+          <div className="size-10 rounded-xl bg-primary/10 flex items-center justify-center">
+            <MessageSquare className="size-5 text-primary" />
+          </div>
+          <h1 className="text-2xl font-bold text-gray-900">Q&A</h1>
         </div>
+        <p className="text-sm text-gray-500">Ask questions about your codebase and save answers for your team.</p>
+      </div>
 
+      {/* Ask question card */}
+      <Sheet>
+        <AskQuestionCard />
+
+        {/* Saved questions */}
+        <section>
+          <div className="flex items-center gap-2 mb-4">
+            <BookOpen className="size-4 text-gray-400" />
+            <h2 className="text-sm font-semibold text-gray-600 uppercase tracking-wide">
+              Saved Questions
+              {questions && questions.length > 0 && (
+                <span className="ml-2 text-xs font-normal text-gray-400 normal-case">
+                  ({questions.length})
+                </span>
+              )}
+            </h2>
+          </div>
+
+          {!questions?.length ? (
+            <div className="rounded-xl border border-dashed border-gray-200 py-14 text-center text-gray-400">
+              <MessageSquare className="size-10 mx-auto mb-3 opacity-30" />
+              <p className="text-sm font-medium">No saved questions yet</p>
+              <p className="text-xs mt-1">Ask a question above and save the answer to share with your team.</p>
+            </div>
+          ) : (
+            <div className="space-y-2">
+              {questions.map((q, index) => (
+                <React.Fragment key={q.id}>
+                  <SheetTrigger
+                    className="w-full text-left"
+                    onClick={() => setQuestionIndex(index)}
+                  >
+                    <div className="flex items-start gap-3 bg-white rounded-xl p-4 border border-gray-200 hover:border-primary/30 hover:shadow-sm transition-all cursor-pointer group">
+                      <img
+                        src={q.user.imageUrl ?? ''}
+                        alt={q.user.firstName ?? ''}
+                        className="size-8 rounded-full shrink-0 ring-2 ring-gray-100 mt-0.5"
+                      />
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-start justify-between gap-2 mb-1">
+                          <p className="text-sm font-semibold text-gray-800 line-clamp-1 group-hover:text-primary transition-colors">
+                            {q.question}
+                          </p>
+                          <span className="text-xs text-gray-400 whitespace-nowrap shrink-0 flex items-center gap-1">
+                            <Calendar className="size-3" />
+                            {new Date(q.createdAt).toLocaleDateString()}
+                          </span>
+                        </div>
+                        <p className="text-xs text-gray-500 line-clamp-2 leading-relaxed">
+                          {q.answer}
+                        </p>
+                      </div>
+                    </div>
+                  </SheetTrigger>
+                </React.Fragment>
+              ))}
+            </div>
+          )}
+        </section>
+
+        {/* Sheet panel */}
         {question && (
-          <SheetContent className='sm:max-w-[90vw] flex flex-col max-h-screen'>
-            <SheetHeader className='flex-shrink-0 border-b pb-4'>
-              <SheetTitle className='text-left'>
-                {question.question}
-              </SheetTitle>
+          <SheetContent className="sm:max-w-[90vw] flex flex-col max-h-screen">
+            <SheetHeader className="shrink-0 border-b pb-4">
+              <div className="flex items-start gap-3">
+                <img
+                  src={question.user.imageUrl ?? ''}
+                  alt=""
+                  className="size-8 rounded-full shrink-0 ring-2 ring-gray-100 mt-0.5"
+                />
+                <SheetTitle className="text-left leading-snug">{question.question}</SheetTitle>
+              </div>
             </SheetHeader>
-            
-            {/* ✅ Scrollable content area */}
-            <div className='flex-1 overflow-auto py-4 space-y-6'>
-              {/* ✅ Answer section */}
+
+            <div className="flex-1 overflow-auto py-5 space-y-6">
               <div>
-                <h3 className='font-semibold mb-2 text-lg'>Answer:</h3>
-                <div className='max-h-[40vh] overflow-auto border rounded-lg p-4 bg-gray-50'>
+                <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">Answer</h3>
+                <div className="max-h-[42vh] overflow-auto rounded-xl border border-gray-200 p-4 bg-gray-50">
                   <MDEditor.Markdown source={question.answer} />
                 </div>
               </div>
-              
-              {/* ✅ File references section with proper type checking */}
+
               {(() => {
-                // Parse the filesReferences JSON and type check
-                let fileRefs: { fileName: string; sourceCode: string; summary: string }[] = [];
-                
+                let fileRefs: { fileName: string; sourceCode: string; summary: string }[] = []
                 try {
                   if (question.filesReferences) {
                     if (typeof question.filesReferences === 'string') {
-                      fileRefs = JSON.parse(question.filesReferences);
+                      fileRefs = JSON.parse(question.filesReferences)
                     } else if (Array.isArray(question.filesReferences)) {
-                      fileRefs = question.filesReferences as any;
+                      fileRefs = question.filesReferences as any
                     }
                   }
-                } catch (error) {
-                  console.error('Error parsing file references:', error);
-                  fileRefs = [];
-                }
+                } catch { fileRefs = [] }
 
-                return fileRefs && fileRefs.length > 0 && (
+                return fileRefs.length > 0 && (
                   <div>
-                    <h3 className='font-semibold mb-2 text-lg'>Code References:</h3>
-                    <div className='border rounded-lg p-4 bg-white'>
+                    <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">Code References</h3>
+                    <div className="rounded-xl border border-gray-200 p-4 bg-white">
                       <CodeReferences filesReferences={fileRefs} />
                     </div>
                   </div>
-                );
+                )
               })()}
             </div>
           </SheetContent>
         )}
-    </Sheet>
+      </Sheet>
+    </div>
   )
 }
 

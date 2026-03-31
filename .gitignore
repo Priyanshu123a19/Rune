@@ -44,3 +44,6 @@ yarn-error.log*
 
 # idea files
 .idea
+# DB backups
+backup_before_kg.sql*
+src/lib/test-supabase.ts

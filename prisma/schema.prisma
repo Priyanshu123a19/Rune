@@ -44,6 +44,14 @@ model Project {
     sourceCodeEmbeddings sourceCodeEmbedding[]
     savedQuestions Question[]
     meetings  Meeting[]
+    codeReviews        CodeReview[]
+    bugInvestigations  BugInvestigation[]
+    onboardingPlans    OnboardingPlan[]
+    testSuites         TestSuite[]
+    sprintPlans        SprintPlan[]
+    prReviews          PrReview[]
+    vulnerabilityScans VulnerabilityScan[]
+    notifications      Notification[]
 }
 
 
@@ -100,12 +108,13 @@ model Issue {
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 
-    start  String
-    end    String
-    gist   String
+    start    String
+    end      String
+    gist     String
     headline String
-    summary String
+    summary  String
 
+    githubIssueUrl String?
 
     meetingId String
     meeting   Meeting @relation(fields: [meetingId], references: [id])
@@ -161,4 +170,202 @@ model Commit {
     commitDate      DateTime
 
     summary         String
-}   
+}
+
+model CodeReview {
+    id        String   @id @default(cuid())
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    projectId String
+    project   Project @relation(fields: [projectId], references: [id])
+
+    commitHash    String
+    commitMessage String @default("")
+
+    securityFindings    Json @default("[]")
+    performanceFindings Json @default("[]")
+    logicFindings       Json @default("[]")
+
+    summary         String         @default("")
+    overallSeverity ReviewSeverity @default(LOW)
+    status          ReviewStatus   @default(COMPLETED)
+}
+
+model BugInvestigation {
+    id             String                  @id @default(cuid())
+    createdAt      DateTime                @default(now())
+    updatedAt      DateTime                @updatedAt
+
+    projectId      String
+    project        Project                 @relation(fields: [projectId], references: [id])
+
+    bugDescription String
+    steps          Json                    @default("[]") // ReActStep[]
+    rootCause      String                  @default("")
+    fixLocation    String                  @default("")
+    suggestedFix   String                  @default("")
+    status         BugInvestigationStatus  @default(INVESTIGATING)
+}
+
+enum BugInvestigationStatus {
+    INVESTIGATING
+    COMPLETED
+    FAILED
+}
+
+model OnboardingPlan {
+    id        String   @id @default(cuid())
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    projectId String
+    project   Project @relation(fields: [projectId], references: [id])
+
+    userId     String  // Clerk user ID
+
+    // Developer assessment inputs
+    role        String  // frontend | backend | fullstack | devops
+    experience  String  // junior | mid | senior
+    background  String  // free-text about their skills
+
+    // Generated output
+    codebaseAnalysis String @default("")
+    learningPath     Json   @default("[]")   // { order, file, concept, reason }[]
+    milestones       Json   @default("{}")   // { week1, week2, week3 }
+    summary          String @default("")
+
+    status OnboardingStatus @default(GENERATING)
+}
+
+enum OnboardingStatus {
+    GENERATING
+    COMPLETED
+    FAILED
+}
+
+model TestSuite {
+    id        String   @id @default(cuid())
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    projectId   String
+    project     Project @relation(fields: [projectId], references: [id])
+
+    fileName    String
+    framework   String  @default("")   // detected: react | nextjs-api | trpc | typescript
+    testCode    String  @default("")   // generated test file content
+    summary     String  @default("")
+
+    status      TestSuiteStatus @default(GENERATING)
+}
+
+model SprintPlan {
+    id        String   @id @default(cuid())
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    projectId String
+    project   Project @relation(fields: [projectId], references: [id])
+
+    userId          String   // Clerk user ID
+
+    issuesAnalyzed  Int      @default(0)
+    commitsAnalyzed Int      @default(0)
+
+    featureClusters Json     @default("[]")  // { area, theme, issueCount, commitCount }[]
+    sprintItems     Json     @default("[]")  // SprintItem[]
+    weekPlan        Json     @default("{}")  // { week1: string[], week2: string[] }
+    summary         String   @default("")
+
+    status SprintPlanStatus @default(GENERATING)
+}
+
+enum SprintPlanStatus {
+    GENERATING
+    COMPLETED
+    FAILED
+}
+
+enum TestSuiteStatus {
+    GENERATING
+    COMPLETED
+    FAILED
+}
+
+enum ReviewSeverity {
+    LOW
+    MEDIUM
+    HIGH
+    CRITICAL
+}
+
+enum ReviewStatus {
+    PROCESSING
+    COMPLETED
+    FAILED
+}
+
+model PrReview {
+    id        String        @id @default(cuid())
+    createdAt DateTime      @default(now())
+    updatedAt DateTime      @updatedAt
+
+    projectId String
+    project   Project       @relation(fields: [projectId], references: [id])
+
+    prNumber       Int
+    prTitle        String
+    prUrl          String    @default("")
+    summary        String    @default("")
+    comments       Json      @default("[]")
+    postedToGithub Boolean   @default(false)
+    status         PrReviewStatus @default(REVIEWING)
+}
+
+enum PrReviewStatus {
+    REVIEWING
+    COMPLETED
+    FAILED
+}
+
+model VulnerabilityScan {
+    id        String   @id @default(cuid())
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    projectId String
+    project   Project @relation(fields: [projectId], references: [id])
+
+    totalPackages   Int @default(0)
+    vulnerableCount Int @default(0)
+    criticalCount   Int @default(0)
+    highCount       Int @default(0)
+    mediumCount     Int @default(0)
+    lowCount        Int @default(0)
+    riskScore       Int @default(100)  // 0-100, higher = safer
+
+    vulnerabilities Json @default("[]")  // VulnerablePackage[]
+    status          VulnerabilityScanStatus @default(SCANNING)
+}
+
+enum VulnerabilityScanStatus {
+    SCANNING
+    COMPLETED
+    FAILED
+}
+
+model Notification {
+    id        String   @id @default(cuid())
+    createdAt DateTime @default(now())
+
+    userId    String
+    projectId String
+    project   Project @relation(fields: [projectId], references: [id])
+
+    type  String   // e.g. "PR_REVIEW" | "BUG_INVESTIGATION" | "TEST_SUITE" etc.
+    title String
+    body  String
+    url   String   @default("")
+    read  Boolean  @default(false)
+}

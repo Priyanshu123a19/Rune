@@ -1,0 +1,185 @@
+2026-03-10 19:22:50.124 [info] Starting Excalidraw MCP server...
+2026-03-10 19:22:50.125 [debug] Connecting to transport...
+2026-03-10 19:22:50.126 [info] Excalidraw MCP server running on stdio
+2026-03-10 19:22:50.137 [info] Listing available tools
+2026-03-10 19:27:00.978 [info] Handling tool call: create_element
+2026-03-10 19:27:00.982 [info] Creating element
+2026-03-10 19:27:06.873 [info] Handling tool call: create_element
+2026-03-10 19:27:06.874 [info] Creating element
+2026-03-10 19:27:13.202 [info] Handling tool call: create_element
+2026-03-10 19:27:13.202 [info] Creating element
+2026-03-10 19:27:27.309 [info] Handling tool call: create_element
+2026-03-10 19:27:27.310 [info] Creating element
+2026-03-10 19:27:32.847 [info] Handling tool call: create_element
+2026-03-10 19:27:32.847 [info] Creating element
+2026-03-10 19:28:40.366 [info] Handling tool call: update_element
+2026-03-10 19:28:40.370 [error] Error handling tool call: keyValidator._parse is not a function
+2026-03-10 19:28:50.891 [info] Handling tool call: update_element
+2026-03-10 19:28:50.891 [error] Error handling tool call: keyValidator._parse is not a function
+2026-03-10 19:29:11.660 [info] Handling tool call: delete_element
+2026-03-10 19:29:16.139 [info] Handling tool call: delete_element
+2026-03-10 19:29:20.055 [info] Handling tool call: create_element
+2026-03-10 19:29:20.056 [info] Creating element
+2026-03-10 19:29:24.127 [info] Handling tool call: create_element
+2026-03-10 19:29:24.128 [info] Creating element
+2026-03-10 19:29:43.599 [info] Handling tool call: create_element
+2026-03-10 19:29:43.600 [info] Creating element
+2026-03-10 19:29:48.184 [info] Handling tool call: create_element
+2026-03-10 19:29:48.185 [info] Creating element
+2026-03-10 19:29:52.740 [info] Handling tool call: create_element
+2026-03-10 19:29:52.741 [info] Creating element
+2026-03-10 19:29:56.307 [info] Handling tool call: create_element
+2026-03-10 19:29:56.307 [info] Creating element
+2026-03-10 19:30:00.451 [info] Handling tool call: create_element
+2026-03-10 19:30:00.452 [info] Creating element
+2026-03-10 19:30:05.292 [info] Handling tool call: create_element
+2026-03-10 19:30:05.292 [info] Creating element
+2026-03-10 19:30:09.914 [info] Handling tool call: create_element
+2026-03-10 19:30:09.914 [info] Creating element
+2026-03-10 19:30:14.029 [info] Handling tool call: create_element
+2026-03-10 19:30:14.029 [info] Creating element
+2026-03-10 19:30:18.236 [info] Handling tool call: create_element
+2026-03-10 19:30:18.237 [info] Creating element
+2026-03-10 19:30:24.278 [info] Handling tool call: create_element
+2026-03-10 19:30:24.278 [info] Creating element
+2026-03-10 19:30:29.471 [info] Handling tool call: create_element
+2026-03-10 19:30:29.471 [info] Creating element
+2026-03-10 19:30:34.671 [info] Handling tool call: create_element
+2026-03-10 19:30:34.672 [info] Creating element
+2026-03-10 19:30:38.966 [info] Handling tool call: create_element
+2026-03-10 19:30:38.966 [info] Creating element
+2026-03-10 19:30:43.513 [info] Handling tool call: create_element
+2026-03-10 19:30:43.513 [info] Creating element
+2026-03-10 19:30:47.928 [info] Handling tool call: create_element
+2026-03-10 19:30:47.928 [info] Creating element
+2026-03-10 19:30:55.267 [info] Handling tool call: create_element
+2026-03-10 19:30:55.267 [info] Creating element
+2026-03-10 19:31:02.410 [info] Handling tool call: create_element
+2026-03-10 19:31:02.410 [info] Creating element
+2026-03-10 19:31:08.997 [info] Handling tool call: create_element
+2026-03-10 19:31:08.997 [info] Creating element
+2026-03-10 19:31:13.810 [info] Handling tool call: create_element
+2026-03-10 19:31:13.810 [info] Creating element
+2026-03-10 19:31:23.907 [info] Handling tool call: create_element
+2026-03-10 19:31:23.907 [info] Creating element
+2026-03-10 19:31:28.341 [info] Handling tool call: create_element
+2026-03-10 19:31:28.341 [info] Creating element
+2026-03-10 19:31:33.344 [info] Handling tool call: create_element
+2026-03-10 19:31:33.344 [info] Creating element
+2026-03-10 19:31:37.860 [info] Handling tool call: create_element
+2026-03-10 19:31:37.860 [info] Creating element
+2026-03-10 19:31:49.840 [info] Handling tool call: create_element
+2026-03-10 19:31:49.840 [info] Creating element
+2026-03-10 19:31:55.153 [info] Handling tool call: create_element
+2026-03-10 19:31:55.153 [info] Creating element
+2026-03-10 19:32:00.199 [info] Handling tool call: create_element
+2026-03-10 19:32:00.200 [info] Creating element
+2026-03-10 19:32:05.259 [info] Handling tool call: create_element
+2026-03-10 19:32:05.259 [info] Creating element
+2026-03-10 19:32:10.273 [info] Handling tool call: create_element
+2026-03-10 19:32:10.274 [info] Creating element
+2026-03-10 19:32:16.941 [info] Handling tool call: create_element
+2026-03-10 19:32:16.942 [info] Creating element
+2026-03-10 19:32:21.795 [info] Handling tool call: create_element
+2026-03-10 19:32:21.795 [info] Creating element
+2026-03-10 19:32:26.932 [info] Handling tool call: create_element
+2026-03-10 19:32:26.933 [info] Creating element
+2026-03-10 20:04:33.822 [info] Handling tool call: create_element
+2026-03-10 20:04:33.822 [info] Creating element
+2026-03-10 20:04:43.137 [info] Handling tool call: create_element
+2026-03-10 20:04:43.138 [info] Creating element
+2026-03-10 20:04:50.867 [info] Handling tool call: create_element
+2026-03-10 20:04:50.868 [info] Creating element
+2026-03-10 20:05:00.775 [info] Handling tool call: create_element
+2026-03-10 20:05:00.775 [info] Creating element
+2026-03-10 20:05:05.399 [info] Handling tool call: create_element
+2026-03-10 20:05:05.399 [info] Creating element
+2026-03-10 20:05:52.998 [info] Handling tool call: create_element
+2026-03-10 20:05:52.998 [info] Creating element
+2026-03-10 20:05:57.307 [info] Handling tool call: create_element
+2026-03-10 20:05:57.307 [info] Creating element
+2026-03-10 20:06:01.350 [info] Handling tool call: create_element
+2026-03-10 20:06:01.350 [info] Creating element
+2026-03-10 20:06:05.289 [info] Handling tool call: create_element
+2026-03-10 20:06:05.289 [info] Creating element
+2026-03-10 20:06:09.653 [info] Handling tool call: create_element
+2026-03-10 20:06:09.653 [info] Creating element
+2026-03-10 20:06:15.028 [info] Handling tool call: create_element
+2026-03-10 20:06:15.029 [info] Creating element
+2026-03-10 20:06:19.289 [info] Handling tool call: create_element
+2026-03-10 20:06:19.289 [info] Creating element
+2026-03-10 20:06:48.214 [info] Handling tool call: create_element
+2026-03-10 20:06:48.214 [info] Creating element
+2026-03-10 20:06:53.003 [info] Handling tool call: create_element
+2026-03-10 20:06:53.004 [info] Creating element
+2026-03-10 20:06:57.409 [info] Handling tool call: create_element
+2026-03-10 20:06:57.410 [info] Creating element
+2026-03-10 20:07:01.722 [info] Handling tool call: create_element
+2026-03-10 20:07:01.722 [info] Creating element
+2026-03-10 20:07:06.077 [info] Handling tool call: create_element
+2026-03-10 20:07:06.077 [info] Creating element
+2026-03-10 20:07:22.841 [info] Handling tool call: create_element
+2026-03-10 20:07:22.841 [info] Creating element
+2026-03-10 20:07:27.045 [info] Handling tool call: create_element
+2026-03-10 20:07:27.045 [info] Creating element
+2026-03-10 20:07:31.203 [info] Handling tool call: create_element
+2026-03-10 20:07:31.203 [info] Creating element
+2026-03-10 20:07:34.902 [info] Handling tool call: create_element
+2026-03-10 20:07:34.903 [info] Creating element
+2026-03-10 20:07:44.526 [info] Handling tool call: create_element
+2026-03-10 20:07:44.526 [info] Creating element
+2026-03-10 20:07:49.435 [info] Handling tool call: create_element
+2026-03-10 20:07:49.435 [info] Creating element
+2026-03-10 20:07:53.536 [info] Handling tool call: create_element
+2026-03-10 20:07:53.536 [info] Creating element
+2026-03-10 20:07:58.635 [info] Handling tool call: create_element
+2026-03-10 20:07:58.635 [info] Creating element
+2026-03-10 20:08:03.471 [info] Handling tool call: create_element
+2026-03-10 20:08:03.471 [info] Creating element
+2026-03-10 20:08:07.199 [info] Handling tool call: create_element
+2026-03-10 20:08:07.199 [info] Creating element
+2026-03-10 20:08:11.001 [info] Handling tool call: create_element
+2026-03-10 20:08:11.001 [info] Creating element
+2026-03-10 20:08:16.921 [info] Handling tool call: create_element
+2026-03-10 20:08:16.921 [info] Creating element
+2026-03-10 20:08:21.672 [info] Handling tool call: create_element
+2026-03-10 20:08:21.673 [info] Creating element
+2026-03-10 20:08:47.815 [info] Handling tool call: create_element
+2026-03-10 20:08:47.816 [info] Creating element
+2026-03-10 20:08:52.831 [info] Handling tool call: create_element
+2026-03-10 20:08:52.831 [info] Creating element
+2026-03-10 20:08:58.179 [info] Handling tool call: create_element
+2026-03-10 20:08:58.180 [info] Creating element
+2026-03-10 20:09:03.373 [info] Handling tool call: create_element
+2026-03-10 20:09:03.373 [info] Creating element
+2026-03-10 20:09:10.125 [info] Handling tool call: create_element
+2026-03-10 20:09:10.125 [info] Creating element
+2026-03-10 20:09:27.874 [info] Handling tool call: create_element
+2026-03-10 20:09:27.874 [info] Creating element
+2026-03-10 20:09:32.799 [info] Handling tool call: create_element
+2026-03-10 20:09:32.800 [info] Creating element
+2026-03-10 20:09:37.831 [info] Handling tool call: create_element
+2026-03-10 20:09:37.831 [info] Creating element
+2026-03-10 20:09:49.899 [info] Handling tool call: create_element
+2026-03-10 20:09:49.899 [info] Creating element
+2026-03-10 20:09:55.195 [info] Handling tool call: create_element
+2026-03-10 20:09:55.195 [info] Creating element
+2026-03-10 20:10:08.389 [info] Handling tool call: create_element
+2026-03-10 20:10:08.390 [info] Creating element
+2026-03-10 20:10:14.254 [info] Handling tool call: create_element
+2026-03-10 20:10:14.255 [info] Creating element
+2026-03-10 20:10:29.996 [info] Handling tool call: delete_element
+2026-03-10 20:10:34.118 [info] Handling tool call: delete_element
+2026-03-10 20:10:38.972 [info] Handling tool call: create_element
+2026-03-10 20:10:38.973 [info] Creating element
+2026-03-10 20:10:43.275 [info] Handling tool call: create_element
+2026-03-10 20:10:43.276 [info] Creating element
+2026-03-10 20:11:28.697 [info] Handling tool call: query_elements
+2026-03-10 20:12:16.448 [info] Handling tool call: create_element
+2026-03-10 20:12:16.448 [info] Creating element
+2026-03-10 20:12:22.785 [info] Handling tool call: create_element
+2026-03-10 20:12:22.785 [info] Creating element
+2026-03-10 20:12:44.258 [info] Handling tool call: delete_element
+2026-03-10 20:12:49.160 [info] Handling tool call: delete_element
+2026-03-10 20:19:35.265 [info] Handling tool call: get_resource
+2026-03-10 20:19:35.265 [info] Getting resource

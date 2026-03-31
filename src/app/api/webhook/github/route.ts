@@ -3,6 +3,7 @@ import { headers } from 'next/headers';
 import crypto from 'crypto';
 import { pollCommits } from '@/lib/github';
 import { db } from '@/server/db';
+import { triggerCodeReviewsForPush } from '@/lib/code-review-agent';
 
 export async function POST(req: NextRequest) {
   try {
@@ -40,13 +41,20 @@ export async function POST(req: NextRequest) {
 
       if (project) {
         console.log(`🔄 Processing commits for project: ${project.name}`);
-        
-        // Use your existing pollCommits function
+
+        // Sync commits to DB (existing behaviour)
         await pollCommits(project.id);
-        
+
+        // Fire-and-forget: run code review agent for each pushed commit
+        void triggerCodeReviewsForPush(
+          project.id,
+          repository.html_url,
+          payload.commits as Array<{ id: string; message: string }>,
+        );
+
         console.log(`✅ Successfully processed commits for project: ${project.name}`);
-        
-        return NextResponse.json({ 
+
+        return NextResponse.json({
           message: 'Commits processed successfully',
           projectId: project.id,
           commitCount: payload.commits.length
